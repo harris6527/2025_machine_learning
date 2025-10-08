@@ -1,0 +1,748 @@
+https://hackmd.io/@teshenglin/2025_ML_week_5_AS
+
+以mardown完成這周的作業，並且要放到一個框框裡讓我能一鍵複製
+ChatGPT 說：
+已思考 40s
+
+下面是一份可直接交到 GitHub week_5 資料夾的 Markdown（已把題目與解答整理好）。我把所有內容放進同一個「框框」裡，方便你一鍵複製：
+
+# SCMA30019 — Week 5 Assignment (Markdown Submission)
+
+> **Source**: Week 5 assignment brief (due **Oct 08, 10:10 AM**, submit under `week_5`; format: ipynb/py/pdf/jpg/md). :contentReference[oaicite:0]{index=0}
+
+---
+
+## ✍️ Written Assignment — Solutions
+
+### 1. Multivariate normal pdf integrates to 1
+
+Given
+\[
+f(x)=\frac{1}{\sqrt{(2\pi)^k|\Sigma|}}\exp\!\left(-\tfrac12 (x-\mu)^{\!\top}\Sigma^{-1}(x-\mu)\right),
+\quad x,\mu\in\mathbb{R}^k,\ \Sigma\succ 0,
+\]
+show that \(\int_{\mathbb{R}^k} f(x)\,dx=1\).
+
+**Proof.** Let \(y=\Sigma^{-1/2}(x-\mu)\) where \(\Sigma^{1/2}\) is the (symmetric) matrix square root of \(\Sigma\). Then \(x=\mu+\Sigma^{1/2}y\) and \(dx = |\Sigma^{1/2}|\,dy = |\Sigma|^{1/2} dy\). Also
+\[
+(x-\mu)^\top \Sigma^{-1}(x-\mu) = y^\top y = \|y\|^2.
+\]
+Hence
+\[
+\int_{\mathbb{R}^k} f(x)\,dx
+= \frac{1}{\sqrt{(2\pi)^k|\Sigma|}}\int_{\mathbb{R}^k}\exp\!\left(-\tfrac12\|y\|^2\right)|\Sigma|^{1/2}\,dy
+= \frac{1}{(2\pi)^{k/2}}\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy.
+\]
+Because the integrand factorizes across coordinates,
+\[
+\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy
+= \prod_{i=1}^k \int_{-\infty}^{\infty} e^{-y_i^2/2}\,dy_i
+= (2\pi)^{k/2}.
+\]
+Therefore the product with \((2\pi)^{-k/2}\) equals \(1\). □
+
+---
+
+### 2. Matrix calculus / trace identities
+
+Let \(A,B\in\mathbb{R}^{n\times n}\) and \(x\in\mathbb{R}^n\).
+
+#### (a) \(\displaystyle \frac{\partial}{\partial A}\,\mathrm{tr}(AB)=B^\top\).
+
+**Derivation.** Using differentials and the identity \(\mathrm{tr}(X^\top Y)=\langle X,Y\rangle_F\):
+\[
+d\,\mathrm{tr}(AB)=\mathrm{tr}(dA\,B)=\mathrm{tr}(B^\top dA)
+=\langle B^\top,\, dA\rangle_F.
+\]
+Thus the gradient w.r.t. \(A\) is \(B^\top\).
+
+#### (b) \(x^\top A x = \mathrm{tr}(x x^\top A)\).
+
+**Derivation.** Since \(\mathrm{tr}(uv^\top)=v^\top u\) for vectors,
+\[
+x^\top A x = \mathrm{tr}(x^\top A x)=\mathrm{tr}(A x x^\top)=\mathrm{tr}(x x^\top A),
+\]
+where the last step uses cyclicity of trace.
+
+---
+
+### 3. Multivariate Gaussian — Maximum Likelihood Estimators
+
+> (Assignment line shows “(b) Derive the maximum likelihood estimators for a multivariate Gaussian.” We present the standard iid case.)
+
+Assume \(x_1,\dots,x_n \stackrel{\text{iid}}{\sim}\mathcal{N}_k(\mu,\Sigma)\) with \(\Sigma\succ 0\).
+The log-likelihood is
+\[
+\ell(\mu,\Sigma)= -\frac{nk}{2}\log(2\pi) - \frac{n}{2}\log|\Sigma|
+-\frac12 \sum_{i=1}^n (x_i-\mu)^\top \Sigma^{-1} (x_i-\mu).
+\]
+
+**Estimator of \(\mu\).** Differentiate w.r.t. \(\mu\) and set to zero:
+\[
+\frac{\partial \ell}{\partial \mu}
+= \Sigma^{-1}\sum_{i=1}^n (x_i-\mu) = 0
+\ \Rightarrow\ 
+\widehat{\mu} = \bar{x} := \frac{1}{n}\sum_{i=1}^n x_i.
+\]
+
+**Estimator of \(\Sigma\).** Substitute \(\widehat{\mu}=\bar{x}\), let
+\(S = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top\).
+Using the identities \(\partial \log|\Sigma|/\partial\Sigma = (\Sigma^{-1})^\top\) and
+\(\partial\,[\mathrm{tr}(\Sigma^{-1}C)]/\partial\Sigma = -(\Sigma^{-1} C\,\Sigma^{-1})^\top\),
+the score equation gives
+\[
+-\frac{n}{2}\Sigma^{-1} + \frac{1}{2}\Sigma^{-1}\!\left(\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top\right)\!\Sigma^{-1}=0
+\ \Rightarrow\ 
+\widehat{\Sigma} = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top = S.
+\]
+> Note: This is the **MLE** (uses \(1/n\)). The unbiased sample covariance uses \(1/(n-1)\).
+
+---
+
+### 4. Unanswered Questions (from lecture)
+
+Write down questions you find important/unclear. Examples:
+- 為何多變量常態的**等密度曲面**是橢球？與 \(\Sigma\) 的特徵向量/值關係是什麼？
+- \(\log|\Sigma|\) 的梯度與海森矩陣是什麼？為何 \(\Sigma\succ0\) 是必要條件？
+- MLE 的 \(\widehat{\Sigma}\) 為何採用 \(1/n\) 而非常見的 \(1/(n-1)\)？兩者在大樣本極限有何關係？
+- 若資料是**奇異**或**小樣本高維** (\(n<k\))，\(\widehat{\Sigma}\) 不可逆時怎麼辦？(如：正則化、Ledoit–Wolf、Graphical Lasso)
+- 以變數變換 \(y=\Sigma^{-1/2}(x-\mu)\) 為何可使積分化為標準常態？\(\Sigma^{1/2}\) 的選擇是否唯一？
+
+---
+
+## ✅ Submission Notes
+
+- 檔名建議：`week_5/assignment.md`。
+- 若另有程式驗證，可附 `week_5/check.ipynb`（示範：用隨機樣本驗證 \(\widehat{\mu},\widehat{\Sigma}\) 的一致性）。
+- Academic Integrity 與工具使用請遵守課綱說明。 :contentReference[oaicite:1]{index=1}
+
+
+如果你要我把這份再轉成 ipynb 或加上 NumPy 檢驗段落、Latex 封面，我可以直接幫你生成對應檔案。
+
+你說：
+markdown不是要用$$和$$來夾住數學式子嗎?
+ChatGPT 說：
+已思考 24s
+
+你說得對：在 HackMD（與大多數支援 KaTeX/MathJax 的平台）中，行內數學用 $...$，獨立展示的數學式用 $$...$$。
+我已把你上一版全部改成「行內 $...$、區塊 
+.
+.
+.
+...」格式，並放在同一個框框，直接一鍵複製即可：
+
+# SCMA30019 — Week 5 Assignment (Markdown Submission)
+
+---
+
+## ✍️ Written Assignment — Solutions
+
+### 1. Multivariate normal pdf integrates to 1
+
+Given
+$$
+f(x)=\frac{1}{\sqrt{(2\pi)^k|\Sigma|}}\exp\!\left(-\tfrac12 (x-\mu)^{\top}\Sigma^{-1}(x-\mu)\right),
+\qquad x,\mu\in\mathbb{R}^k,\ \Sigma\succ 0,
+$$
+show that $\int_{\mathbb{R}^k} f(x)\,dx=1$.
+
+**Proof.** Let $y=\Sigma^{-1/2}(x-\mu)$ where $\Sigma^{1/2}$ is the (symmetric) matrix square root of $\Sigma$. Then $x=\mu+\Sigma^{1/2}y$ and $dx = |\Sigma^{1/2}|\,dy = |\Sigma|^{1/2}\,dy$. Also
+$$
+(x-\mu)^\top \Sigma^{-1}(x-\mu) = y^\top y = \|y\|^2 .
+$$
+Hence
+$$
+\int_{\mathbb{R}^k} f(x)\,dx
+= \frac{1}{\sqrt{(2\pi)^k|\Sigma|}}
+\int_{\mathbb{R}^k}\exp\!\left(-\tfrac12\|y\|^2\right)|\Sigma|^{1/2}\,dy
+= \frac{1}{(2\pi)^{k/2}}\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy .
+$$
+Because the integrand factorizes across coordinates,
+$$
+\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy
+= \prod_{i=1}^k \int_{-\infty}^{\infty} e^{-y_i^2/2}\,dy_i
+= (2\pi)^{k/2}.
+$$
+Therefore the product with $(2\pi)^{-k/2}$ equals $1$. $\square$
+
+---
+
+### 2. Matrix calculus / trace identities
+
+Let $A,B\in\mathbb{R}^{n\times n}$ and $x\in\mathbb{R}^n$.
+
+#### (a) Gradient of $\mathrm{tr}(AB)$ w.r.t. $A$
+Using differentials and $\mathrm{tr}(X^\top Y)=\langle X,Y\rangle_F$:
+$$
+d\,\mathrm{tr}(AB)=\mathrm{tr}(dA\,B)=\mathrm{tr}(B^\top dA)
+=\langle B^\top,\, dA\rangle_F
+\ \Rightarrow\ 
+\frac{\partial}{\partial A}\,\mathrm{tr}(AB)=B^\top .
+$$
+
+#### (b) Quadratic form as a trace
+$$
+x^\top A x
+= \mathrm{tr}(x^\top A x)
+= \mathrm{tr}(A x x^\top)
+= \mathrm{tr}(x x^\top A).
+$$
+
+---
+
+### 3. Multivariate Gaussian — Maximum Likelihood Estimators
+
+Assume $x_1,\dots,x_n \stackrel{\text{iid}}{\sim}\mathcal{N}_k(\mu,\Sigma)$ with $\Sigma\succ 0$.
+The log-likelihood is
+$$
+\ell(\mu,\Sigma)= -\frac{nk}{2}\log(2\pi) - \frac{n}{2}\log|\Sigma|
+-\frac12 \sum_{i=1}^n (x_i-\mu)^\top \Sigma^{-1} (x_i-\mu).
+$$
+
+**Estimator of $\mu$.** Differentiate and set to zero:
+$$
+\frac{\partial \ell}{\partial \mu}
+= \Sigma^{-1}\sum_{i=1}^n (x_i-\mu) = 0
+\ \Rightarrow\ 
+\widehat{\mu} = \bar{x} := \frac{1}{n}\sum_{i=1}^n x_i.
+$$
+
+**Estimator of $\Sigma$.** Substitute $\widehat{\mu}=\bar{x}$ and let
+$$
+S = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top .
+$$
+Using $\partial \log|\Sigma|/\partial\Sigma = (\Sigma^{-1})^\top$ and
+$\partial\,\mathrm{tr}(\Sigma^{-1}C)/\partial\Sigma = -(\Sigma^{-1} C\,\Sigma^{-1})^\top$, the score equation gives
+$$
+-\frac{n}{2}\Sigma^{-1} + \frac{1}{2}\Sigma^{-1}\!\left(\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top\right)\!\Sigma^{-1}=0
+\ \Rightarrow\ 
+\widehat{\Sigma} = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top = S .
+$$
+
+> Note: This is the **MLE** (uses $1/n$). The unbiased sample covariance uses $1/(n-1)$.
+
+---
+
+### 4. Unanswered Questions (from lecture)
+
+- 為何多變量常態的**等密度曲面**是橢球？與 $\Sigma$ 的特徵向量/值關係是什麼？
+- $\log|\Sigma|$ 的梯度與海森矩陣是什麼？為何 $\Sigma\succ0$ 是必要條件？
+- MLE 的 $\widehat{\Sigma}$ 為何採用 $1/n$ 而非常見的 $1/(n-1)$？兩者在大樣本極限有何關係？
+- 若資料是**奇異**或**小樣本高維**（$n<k$），$\widehat{\Sigma}$ 不可逆時怎麼辦？（如：正則化、Ledoit–Wolf、Graphical Lasso）
+- 以變數變換 $y=\Sigma^{-1/2}(x-\mu)$ 為何可使積分化為標準常態？$\Sigma^{1/2}$ 的選擇是否唯一？
+
+---
+
+## ✅ Submission Notes
+
+- 檔名建議：`week_5/assignment.md`。
+- 若另有程式驗證，可附 `week_5/check.ipynb`（示範：用隨機樣本驗證 $\widehat{\mu},\widehat{\Sigma}$ 的一致性）。
+- 請遵守課程的學術誠信規範與繳交格式。
+
+
+需要我把這份再轉成 ipynb（含 Markdown 與小段 NumPy 驗證）或是HackMD 專用章節目錄嗎？我可以直接生出來給你。
+
+你說：
+https://hackmd.io/@YyhsqslfRQubxwUVAUFhAw/H1B4a9G6gx
+
+有對嗎?
+ChatGPT 說：
+
+看起來已經對了，數學環境也正確用上了 $$...$$。
+只建議幾個小細節，讓排版更乾淨一致：
+
+把行內的集合與轉置寫成 \mathbb{R}^k、\top（你已經用對），
+
+雅可比那行可寫成 dx = |\Sigma^{1/2}|\,dy = |\Sigma|^{1/2} dy（加個細空白 \, 會更漂亮），
+
+決定式可用 \det\Sigma 以免豎線和絕對值混淆，
+
+推導段落用 aligned 對齊更易讀。
+
+給你一段「可直接覆蓋」的版本（同樣放在一個框框，貼到 HackMD 就好）：
+
+### 1. Multivariate normal pdf integrates to 1
+
+Given
+$$
+f(x)=\frac{1}{\sqrt{(2\pi)^k\det(\Sigma)}}\,
+\exp\!\left(-\tfrac12 (x-\mu)^{\top}\Sigma^{-1}(x-\mu)\right),
+\qquad x,\mu\in\mathbb{R}^k,\ \Sigma\succ 0,
+$$
+show that $\int_{\mathbb{R}^k} f(x)\,dx=1$.
+
+**Proof.** Let $y=\Sigma^{-1/2}(x-\mu)$ where $\Sigma^{1/2}$ is the (symmetric) matrix square root of $\Sigma$.  
+Then $x=\mu+\Sigma^{1/2}y$ and $dx = \lvert\Sigma^{1/2}\rvert\,dy = \lvert\Sigma\rvert^{1/2} dy$. Also
+$(x-\mu)^\top \Sigma^{-1}(x-\mu)=y^\top y=\|y\|^2$.
+Hence
+\[
+\begin{aligned}
+\int_{\mathbb{R}^k} f(x)\,dx
+&= \frac{1}{\sqrt{(2\pi)^k\lvert\Sigma\rvert}}
+   \int_{\mathbb{R}^k} \exp\!\left(-\tfrac12\|y\|^2\right)\,\lvert\Sigma\rvert^{1/2}\,dy \\
+&= \frac{1}{(2\pi)^{k/2}}\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy
+ = \frac{1}{(2\pi)^{k/2}}\prod_{i=1}^k \int_{-\infty}^{\infty} e^{-y_i^2/2}\,dy_i \\
+&= \frac{1}{(2\pi)^{k/2}} \,(2\pi)^{k/2} = 1.\ \square
+\end{aligned}
+\]
+
+
+如果你要，我也可以把整份 Week 5 都改成這種對齊風格。
+
+你說：
+把你剛剛說要修改的，改到以下代碼中
+
+
+### 1. Multivariate normal pdf integrates to 1
+
+Given
+$$
+f(x)=\frac{1}{\sqrt{(2\pi)^k|\Sigma|}}\exp\!\left(-\tfrac12 (x-\mu)^{\top}\Sigma^{-1}(x-\mu)\right),
+\qquad x,\mu\in\mathbb{R}^k,\ \Sigma\succ 0,
+$$
+show that $\int_{\mathbb{R}^k} f(x)\,dx=1$.
+
+**Proof.** Let $y=\Sigma^{-1/2}(x-\mu)$ where $\Sigma^{1/2}$ is the (symmetric) matrix square root of $\Sigma$. Then $x=\mu+\Sigma^{1/2}y$ and $dx = |\Sigma^{1/2}|\,dy = |\Sigma|^{1/2}\,dy$. Also
+$$
+(x-\mu)^\top \Sigma^{-1}(x-\mu) = y^\top y = \|y\|^2 .
+$$
+Hence
+$$
+\int_{\mathbb{R}^k} f(x)\,dx
+= \frac{1}{\sqrt{(2\pi)^k|\Sigma|}}
+\int_{\mathbb{R}^k}\exp\!\left(-\tfrac12\|y\|^2\right)|\Sigma|^{1/2}\,dy
+= \frac{1}{(2\pi)^{k/2}}\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy .
+$$
+Because the integrand factorizes across coordinates,
+$$
+\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy
+= \prod_{i=1}^k \int_{-\infty}^{\infty} e^{-y_i^2/2}\,dy_i
+= (2\pi)^{k/2}.
+$$
+Therefore the product with $(2\pi)^{-k/2}$ equals $1$. $\square$
+
+---
+
+### 2. Matrix calculus / trace identities
+
+Let $A,B\in\mathbb{R}^{n\times n}$ and $x\in\mathbb{R}^n$.
+
+#### (a) Gradient of $\mathrm{tr}(AB)$ w.r.t. $A$
+Using differentials and $\mathrm{tr}(X^\top Y)=\langle X,Y\rangle_F$:
+$$
+d\,\mathrm{tr}(AB)=\mathrm{tr}(dA\,B)=\mathrm{tr}(B^\top dA)
+=\langle B^\top,\, dA\rangle_F
+\ \Rightarrow\ 
+\frac{\partial}{\partial A}\,\mathrm{tr}(AB)=B^\top .
+$$
+
+#### (b) Quadratic form as a trace
+$$
+x^\top A x
+= \mathrm{tr}(x^\top A x)
+= \mathrm{tr}(A x x^\top)
+= \mathrm{tr}(x x^\top A).
+$$
+
+---
+
+### 3. Multivariate Gaussian — Maximum Likelihood Estimators
+
+Assume $x_1,\dots,x_n \stackrel{\text{iid}}{\sim}\mathcal{N}_k(\mu,\Sigma)$ with $\Sigma\succ 0$.
+The log-likelihood is
+$$
+\ell(\mu,\Sigma)= -\frac{nk}{2}\log(2\pi) - \frac{n}{2}\log|\Sigma|
+-\frac12 \sum_{i=1}^n (x_i-\mu)^\top \Sigma^{-1} (x_i-\mu).
+$$
+
+**Estimator of $\mu$.** Differentiate and set to zero:
+$$
+\frac{\partial \ell}{\partial \mu}
+= \Sigma^{-1}\sum_{i=1}^n (x_i-\mu) = 0
+\ \Rightarrow\ 
+\widehat{\mu} = \bar{x} := \frac{1}{n}\sum_{i=1}^n x_i.
+$$
+
+**Estimator of $\Sigma$.** Substitute $\widehat{\mu}=\bar{x}$ and let
+$$
+S = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top .
+$$
+Using $\partial \log|\Sigma|/\partial\Sigma = (\Sigma^{-1})^\top$ and
+$\partial\,\mathrm{tr}(\Sigma^{-1}C)/\partial\Sigma = -(\Sigma^{-1} C\,\Sigma^{-1})^\top$, the score equation gives
+$$
+-\frac{n}{2}\Sigma^{-1} + \frac{1}{2}\Sigma^{-1}\!\left(\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top\right)\!\Sigma^{-1}=0
+\ \Rightarrow\ 
+\widehat{\Sigma} = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top = S .
+$$
+
+> Note: This is the **MLE** (uses $1/n$). The unbiased sample covariance uses $1/(n-1)$.
+
+---
+
+### 4. Unanswered Questions (from lecture)
+
+- 為何多變量常態的**等密度曲面**是橢球？與 $\Sigma$ 的特徵向量/值關係是什麼？
+- $\log|\Sigma|$ 的梯度與海森矩陣是什麼？為何 $\Sigma\succ0$ 是必要條件？
+- MLE 的 $\widehat{\Sigma}$ 為何採用 $1/n$ 而非常見的 $1/(n-1)$？兩者在大樣本極限有何關係？
+- 若資料是**奇異**或**小樣本高維**（$n<k$），$\widehat{\Sigma}$ 不可逆時怎麼辦？（如：正則化、Ledoit–Wolf、Graphical Lasso）
+- 以變數變換 $y=\Sigma^{-1/2}(x-\mu)$ 為何可使積分化為標準常態？$\Sigma^{1/2}$ 的選擇是否唯一？
+
+---
+
+## ✅ Submission Notes
+
+- 檔名建議：week_5/assignment.md。
+- 若另有程式驗證，可附 week_5/check.ipynb（示範：用隨機樣本驗證 $\widehat{\mu},\widehat{\Sigma}$ 的一致性）。
+- 請遵守課程的學術誠信規範與繳交格式。
+ChatGPT 說：
+
+已依你剛剛要改的點（|Σ| → \det(\Sigma)、加上 \, 細空白、用 aligned 對齊、相關導數用 \log\det(\Sigma)）直接改在你的稿上，整份放在同一個框框給你一鍵複製：
+
+### 1. Multivariate normal pdf integrates to 1
+
+Given
+$$
+f(x)=\frac{1}{\sqrt{(2\pi)^k\det(\Sigma)}}\,
+\exp\!\left(-\tfrac12 (x-\mu)^{\top}\Sigma^{-1}(x-\mu)\right),
+\qquad x,\mu\in\mathbb{R}^k,\ \Sigma\succ 0,
+$$
+show that $\int_{\mathbb{R}^k} f(x)\,dx=1$.
+
+**Proof.** Let $y=\Sigma^{-1/2}(x-\mu)$ where $\Sigma^{1/2}$ is the (symmetric) matrix square root of $\Sigma$. Then $x=\mu+\Sigma^{1/2}y$ and $dx = \lvert\Sigma^{1/2}\rvert\,dy = \lvert\Sigma\rvert^{1/2}\,dy$. Also
+$$
+(x-\mu)^\top \Sigma^{-1}(x-\mu) = y^\top y = \|y\|^2 .
+$$
+Hence
+\[
+\begin{aligned}
+\int_{\mathbb{R}^k} f(x)\,dx
+&= \frac{1}{\sqrt{(2\pi)^k\lvert\Sigma\rvert}}
+   \int_{\mathbb{R}^k}\exp\!\left(-\tfrac12\|y\|^2\right)\,\lvert\Sigma\rvert^{1/2}\,dy \\
+&= \frac{1}{(2\pi)^{k/2}}\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy .
+\end{aligned}
+\]
+Because the integrand factorizes across coordinates,
+$$
+\int_{\mathbb{R}^k} e^{-\|y\|^2/2}\,dy
+= \prod_{i=1}^k \int_{-\infty}^{\infty} e^{-y_i^2/2}\,dy_i
+= (2\pi)^{k/2}.
+$$
+Therefore the product with $(2\pi)^{-k/2}$ equals $1$. $\square$
+
+---
+
+### 2. Matrix calculus / trace identities
+
+Let $A,B\in\mathbb{R}^{n\times n}$ and $x\in\mathbb{R}^n$.
+
+#### (a) Gradient of $\mathrm{tr}(AB)$ w.r.t. $A$
+Using differentials and $\mathrm{tr}(X^\top Y)=\langle X,Y\rangle_F$:
+$$
+d\,\mathrm{tr}(AB)=\mathrm{tr}(dA\,B)=\mathrm{tr}(B^\top dA)
+=\langle B^\top,\, dA\rangle_F
+\ \Rightarrow\ 
+\frac{\partial}{\partial A}\,\mathrm{tr}(AB)=B^\top .
+$$
+
+#### (b) Quadratic form as a trace
+$$
+x^\top A x
+= \mathrm{tr}(x^\top A x)
+= \mathrm{tr}(A x x^\top)
+= \mathrm{tr}(x x^\top A).
+$$
+
+---
+
+### 3. Multivariate Gaussian — Maximum Likelihood Estimators
+
+Assume $x_1,\dots,x_n \stackrel{\text{iid}}{\sim}\mathcal{N}_k(\mu,\Sigma)$ with $\Sigma\succ 0$.
+The log-likelihood is
+$$
+\ell(\mu,\Sigma)= -\frac{nk}{2}\log(2\pi) - \frac{n}{2}\log\det(\Sigma)
+-\frac12 \sum_{i=1}^n (x_i-\mu)^\top \Sigma^{-1} (x_i-\mu).
+$$
+
+**Estimator of $\mu$.** Differentiate and set to zero:
+$$
+\frac{\partial \ell}{\partial \mu}
+= \Sigma^{-1}\sum_{i=1}^n (x_i-\mu) = 0
+\ \Rightarrow\ 
+\widehat{\mu} = \bar{x} := \frac{1}{n}\sum_{i=1}^n x_i.
+$$
+
+**Estimator of $\Sigma$.** Substitute $\widehat{\mu}=\bar{x}$ and let
+$$
+S = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top .
+$$
+Using $\partial \log\det(\Sigma)/\partial\Sigma = (\Sigma^{-1})^\top$ and
+$\partial\,\mathrm{tr}(\Sigma^{-1}C)/\partial\Sigma = -(\Sigma^{-1} C\,\Sigma^{-1})^\top$, the score equation gives
+$$
+-\frac{n}{2}\Sigma^{-1} + \frac{1}{2}\Sigma^{-1}\!\left(\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top\right)\!\Sigma^{-1}=0
+\ \Rightarrow\ 
+\widehat{\Sigma} = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})(x_i-\bar{x})^\top = S .
+$$
+
+> Note: This is the **MLE** (uses $1/n$). The unbiased sample covariance uses $1/(n-1)$.
+
+---
+
+### 4. Unanswered Questions (from lecture)
+
+- 為何多變量常態的**等密度曲面**是橢球？與 $\Sigma$ 的特徵向量/值關係是什麼？
+- $\log\det(\Sigma)$ 的梯度與海森矩陣是什麼？為何 $\Sigma\succ0$ 是必要條件？
+- MLE 的 $\widehat{\Sigma}$ 為何採用 $1/n$ 而非常見的 $1/(n-1)$？兩者在大樣本極限有何關係？
+- 若資料是**奇異**或**小樣本高維**（$n<k$），$\widehat{\Sigma}$ 不可逆時怎麼辦？（如：正則化、Ledoit–Wolf、Graphical Lasso）
+- 以變數變換 $y=\Sigma^{-1/2}(x-\mu)$ 為何可使積分化為標準常態？$\Sigma^{1/2}$ 的選擇是否唯一？
+
+---
+
+## ✅ Submission Notes
+
+- 檔名建議：`week_5/assignment.md`。
+- 若另有程式驗證，可附 `week_5/check.ipynb`（示範：用隨機樣本驗證 $\widehat{\mu},\widehat{\Sigma}$ 的一致性）。
+- 請遵守課程的學術誠信規範與繳交格式。
+
+
+還要我把「2. Matrix calculus」也改成 aligned 版或加上更嚴謹的微分步驟嗎？我可以直接替換好給你。
+
+你說：
+關於提問的問題，老師說會跟final project有關，我想做跟量化或程式交易，總之就是跟金融buy side有關的題目，請問該提什麼
+ChatGPT 說：
+
+超讚—把題目往「買方量化 / 程式交易」收斂，老師通常會回以「資料可得性＋可評估性＋風險控管」三件事。下面給你一份「高含金量提問清單」＋「可直接落地的 Final Project 題材」，每題都能引到可交付的成果。
+
+高含金量提問（精準版）
+A. 資料與可交付
+
+期末專題是否允許使用免費金融資料（台股/期貨/外匯、FRED、Yahoo、FinMind）？若有限制，建議的資料來源與最小樣本長度為何？
+
+專題成績比較偏向方法創新還是實證嚴謹？（例如：新特徵 vs. 穩健回測與報告寫作）
+
+是否需要可重現（reproducible）環境（requirements.txt / seed / 隨機性控管）？是否加分？
+
+B. 特徵工程與模型
+
+做價格預測時，您建議的預測目標是方向（sign）、超額報酬、或風險調整後報酬（如 Sharpe 的分子）？
+
+在高自相關與非平穩資料上，交叉驗證切法您建議用 Purged/Embargoed CV 嗎？課上是否接受這類做法當成嚴謹性的證據？
+
+若使用樹模/深度學習，對特徵洩漏（leakage）與未來函數的底線是什麼？可否列出幾個常見踩雷例子？
+
+C. 回測與績效評估
+
+評分時最看重哪三個指標？（例：年化報酬、Sharpe、最大回撤、Calmar、勝率、盈虧比、Turnover、成本後績效）
+
+交易成本可否統一假設（例如台股現股 0.1425% 費率＋證交稅 0.3% / 期指單邊幾點）？是否提供成本表以利班上可比？
+
+Walk-forward 與 rolling window 哪一種分割最符合專題預期？測試集至少要多長？
+
+D. 風險控管與穩健性
+
+是否要求加入風控模組（如波動度目標、倉位上限、停損停利、風險平價配重）？這部分會占分嗎？
+
+穩健性檢驗可否用 白化噪聲（permute labels）/ 破壞特徵 / 替代成本 / 子樣本（牛熊市） 等「挑戰測試」來加分？
+
+是否鼓勵多資產/多市場的「橫向外推」測試以證明泛化？
+
+E. 執行與微結構
+
+若做短頻策略，是否需要考慮委託型態（限價/市價）與滑價模型？可否用簡化版（如固定滑點）？
+
+是否接受把回測頻率定在日/60分/15分等可取得層級，以避免 LOB（報價簿）資料不可得？
+
+F. 報告與學術誠信
+
+報告是否需要Ablation（去掉某特徵或模組的影響）與錯誤分析（何時失效）？
+
+可否引用現成開源框架（backtrader / zipline / vectorbt / mlfinlab）？使用時要如何標註避免抄襲疑慮？
+
+G. 與買方實務接軌
+
+若以買方視角，您最期待同學展示哪類可落地能力？（例：資料清理與管線、風控、策略治理而非僅僅提高收益）
+
+是否加分：把模型以風險目標（target volatility）或資本占用為核心，而不是單看報酬？
+
+若策略表現普通，但實驗設計嚴謹＋可重現＋失效原因分析完整，是否仍可拿到高分？
+
+可直接落地的 Final Project 題材（都可用免費資料）
+
+每題都附：目標 / 資料 / 方法 / 評估。你可先問老師是否核可其一。
+
+1) 波動度目標化的動能策略（多資產）
+
+目標：在波動度對齊後，比較動能 vs. 均值回歸的穩健性。
+
+資料：台股/ETF（0050/00637L/00632R）、主要外匯或期指日線（Yahoo/FinMind）。
+
+方法：特徵＝過去 20/60 日報酬、ATR；倉位用 target vol（例如年化 10%），止損用 ATR。
+
+評估：年化、Sharpe、最大回撤、Turnover、成本後績效；子樣本在牛/熊市各段。
+
+2) 事件驅動：財報/法說後的短期漂移
+
+目標：公告後 1–5 日的方向性或超額報酬。
+
+資料：台股重大訊息（公開資訊觀測站可手動蒐集）＋日線。
+
+方法：標記事件日，做 event study；模型可先規則、再加樹模（XGBoost）。
+
+評估：事件窗口平均超額報酬、t 檢定、成本後淨值、分產業/市值分組。
+
+3) 交叉資產避險開關（Regime Switching）
+
+目標：用宏觀或市場情緒指標切換風險資產/避險資產（股債/黃金/美元）。
+
+資料：FRED（VIX、Term Spread）、ETF 日線。
+
+方法：隱馬可夫或簡單規則（VIX 分位數、收益均線交叉）＋資產配置。
+
+評估：年化、Sharpe、回撤、在極端時段（疫情、升息周期）的表現。
+
+4) 因子組合：台股小型股溢酬（Size/Value/Quality）
+
+目標：用公開可得財報欄位做簡版三因子/五因子，測試橫斷面多空。
+
+資料：FinMind 財報＋收盤價。
+
+方法：每月重平衡，分組排序，組合中性化；可加風險平價權重。
+
+評估：因子收益、IC/RankIC、Turnover、交易成本敏感度。
+
+5) 簡化型「成本敏感」策略治理
+
+目標：同一策略在不同成本與滑點假設下的脆弱性分析。
+
+資料：任一上面題材的價格資料。
+
+方法：建立成本掃描（0.02%→0.3%）＋滑點掃描；畫敏感度曲線。
+
+評估：Sharpe/Calmar 隨成本變化；找出臨界點與可行區間。
+
+提問話術（上課可直接用）
+
+「老師，期末專題若做買方量化，我們是否可以用 Yahoo/FinMind 的日線資料？回測是否需要 Purged CV 或 Walk-forward 才算嚴謹？」
+
+「績效評分最重視哪三個指標？是否一律以成本後績效為準，交易成本能否提供統一假設？」
+
+「我們想做事件驅動與風險目標策略，請問風控（如 ATR 停損、倉位上限）會計分嗎？是否需要做子樣本與穩健性檢驗？」
+
+需要的話，我可以把你選定的題目快速變成專題大綱（目標/資料/方法/評估/時程），附上可重現的Python 專案骨架（資料管線、回測、報表與圖表）。
+
+你說：
+問的時候不要裝專業
+ChatGPT 說：
+
+懂！這裡給你「不裝專業、白話又不失重點」的提問稿，口頭版＋訊息版都準備好，你照貼就行。
+
+口頭版（課堂直接講）
+
+開場白（選一句）
+
+老師我想做跟「買方量化／程式交易」有關的期末題目，可以確認幾件事嗎？
+
+我想做金融類的專題，但怕方向太發散，想先問三個小問題。
+
+三個核心問題（超白話）
+
+資料能用哪些？
+我用得到的免費資料是 Yahoo/FinMind（日線或60分K）。這樣可以嗎？還是您建議別的來源？
+
+你最看重什麼？
+成績比較看「方法新不新」還是「回測做得穩、可重現」？我時間會先卡在後者。
+
+交易成本怎麼算？
+我可不可以用一個班上都一樣的成本假設？（例如台股現股手續費＋證交稅、或期指單邊幾點）
+
+如果老師點頭，再加問一題就收尾
+
+回測切法我要用「往前走的分割」（train 在前、test 在後），這樣就夠了嗎？還是需要更嚴謹一點的做法？
+
+要不要放基本的風控（像是波動度目標、停損/部位上限）？這會加分嗎？
+
+結束語
+
+好的，那我就照您建議的資料跟成本做，先做一版 demo 給您看，謝謝！
+
+訊息版（Line/課堂平台貼文）
+
+老師您好～我想做跟「買方量化／程式交易」有關的期末專題。想先確認：
+
+我能用 Yahoo 或 FinMind 的日線/60分K資料嗎？若不行，您建議的資料來源是？
+
+評分重點會比較偏「創新」還是「回測嚴謹＋可重現」？
+
+交易成本是否可以用班上統一的假設（例如台股現股手續費＋證交稅，或期指單邊幾點）？
+若可以的話，我會用「往前走」的切法做回測，並放基本風控（停損/部位上限）。這樣方向 OK 嗎？謝謝！
+
+一句話題目提案（讓老師秒懂）
+
+「我想做動能 vs. 均值回歸，資料用日線，成本後比較誰比較穩。」
+
+「做事件驅動：財報或重大訊息後 1～5 天的表現，有沒有可用的規則。」
+
+「做風險開關：用簡單指標（像 VIX 分位）在股／債／黃金間切換，看能不能減回撤。」
+
+「做小型股因子：每月重平衡的簡單多空，看看成本後還剩多少。」
+
+「做成本敏感度：同一策略在不同手續費／滑點下的表現差多少，找臨界點。」
+
+小提醒（避免不小心很專業）
+
+把「交叉驗證、embargo、HMM」換成：「回測切法更嚴謹一點的做法」、「用簡單規則先試」。
+
+把「Sharpe/Calmar/turnover」換成：「年化報酬、回撤、交易次數大概幾次」。
+
+先問「能不能、要不要、算不算分」，再談方法；一句話就收，不展開理論。
+
+需要我把其中一個題目變成1頁A4專題大綱（目標/資料/做法/產出/時程）嗎？我可以直接幫你寫好。
+
+你說：
+就只要問問題就好，把老師當作是數學和機器學習專業的
+你說：
+就只要問問題就好，把老師當作是數學和機器學習專業的
+ChatGPT 說：
+已思考 5s
+
+下面是「只問問題」的精簡版，直接貼給老師就行（不裝專業、句子短、指向清楚）：
+
+老師好，我想做跟買方量化／程式交易有關的期末專題，想請教幾個方向上的問題：
+
+1) 資料來源：我能用 Yahoo/FinMind 的日線或 60 分鐘資料嗎？您有更推薦或必用的來源嗎？
+2) 目標變數：您建議預測方向（漲跌）、超額報酬，還是做資產配置的權重？
+3) 評分重點：您會比較看「方法創新」還是「回測嚴謹與可重現」？
+4) 成本設定：交易成本與稅費可否用班上統一假設？若可以，數值建議是多少？
+5) 切資料：回測用「訓練在前、測試在後」就可以嗎？還是希望我做更嚴謹的分割？
+6) 風控是否加分：例如波動度目標、停損、部位上限，這些要不要列為必要項？
+7) 穩健性檢查：您希望看到哪些檢查（不同子樣本、成本敏感度、隨機打亂標籤等）？
+8) 頻率限制：如果沒有報價簿資料，是否建議我把頻率限定在日/60 分鐘？
+9) 模型範圍：若用樹模或簡單深度學習，您最在意的「避免未來資訊」點有哪些？
+10) 指標三選：您最重視哪三個績效指標？（例如年化報酬、最大回撤、成交次數等）
+11) 主題偏好：在「動能 vs. 均值回歸／事件驅動／風險開關／簡單因子」之中，您比較期待哪一類？
+12) 報告要求：是否需要做 ablation（拿掉某特徵或模組的對照）與失敗案例分析？
+13) 可重現性：是否需要固定亂數種子與提供環境檔（requirements.txt）？
+14) 外推測試：是否鼓勵把同一方法在不同資產或市場上做橫向驗證？
+15) 期望產出：以您的標準，一個「合格且有說服力」的最小交付包含哪些圖表與表格？
+
+你說：
+這只是一個機器學習課程，沒有教任何金融相關的
+ChatGPT 說：
+老師好～我想做一個「買方量化／程式交易」方向的期末專題，但我知道本課程重點是機器學習本身、不是金融。想請教幾個跟 ML 評估與作業規範相關的問題：
+
+1) 題目範圍：只要重點在 ML 方法與實驗設計，題材用金融可以嗎？
+2) 資料來源：可用公開免費資料（Yahoo/FinMind）嗎？是否需要先給您看資料描述與欄位？
+3) 監督目標：您比較建議做分類（上/下）、回歸（未來報酬）、還是序列預測（多步）？
+4) 分割方式：時間序列要用「訓練在前、測試在後」即可嗎？需要做 rolling / walk-forward 嗎？
+5) 資料洩漏：您希望我特別檢查哪些常見的未來資訊（如用到未來收盤、跨期聚合等）？
+6) 穩健性：希望看到哪些穩健性測試？（不同時間段、打亂標籤、特徵移除 ablation）
+7) 指標與報表：您最想看的核心指標是哪些？（例如 MAE/MSE、AUC、F1、時間序列的 MAPE、RMSE）
+8) 可重現性：是否要求固定 random seed、提交 requirements.txt、以及結果可重跑的腳本？
+9) 複雜度上限：模型複雜度（例如深度網路）有建議的上限嗎？是否需要先從基準模型做起？
+10) 特徵工程：對時序資料是否建議只用「過去可得」的滯後特徵？能否使用技術指標作為工程示例？
+11) 比較基準：需要與哪些 baseline 比較才算有說服力？（如簡單移動平均、線性模型）
+12) 成本與交易細節：若題材是金融，課程是否不要求真實手續費/滑點，只看 ML 指標即可？
+13) 報告重點：結果一般但設計嚴謹（資料清理、分割、檢核完整），是否仍可拿到不錯的分數？
+14) 原始碼規範：是否需要 notebook + 模組化程式結構、以及說明檔 README？
+15) 期限與里程碑：期中前需要給您題目與資料示例嗎？是否需要期中進度簡報？
+
+若以上方向 OK，我就先做資料描述與基準模型給您確認，謝謝！
