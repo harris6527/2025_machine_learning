@@ -1,0 +1,125 @@
+https://hackmd.io/@teshenglin/2025_ML_week_6_AS
+
+看得到這份作業與要求嗎?關注Programming assignment就好，資料集在資料夾裡了
+
+
+看得到，而且我已抓到「Programming assignment」重點。也確認到資料檔就在目前資料夾：O-A0038-003.xml。
+
+Programming Assignment
+
+GDA 分類
+自行實作 GDA（不使用現成分類器）
+說明 GDA 原理與為何適用此資料
+用資料集訓練並回報表現（說明評估方式，例如 train/test 或交叉驗證）
+繪出決策邊界
+回歸 + 分段模型
+將 Week 4 的分類 C(x) 與回歸 R(x) 合併成
+h(x) = R(x) 若 C(x)=1；否則 -999
+以程式實作合併模型、套用到資料集驗證分段行為
+簡述建模方式，並附上圖表/表格
+我可以直接開始實作：讀取 O-A0038-003.xml 生成 (經度, 緯度, label/value) 的兩個資料集；用 NumPy 寫 GDA（二元、共用協方差）；回歸用簡單多項式線性回歸（閉式解，含輕微正則化），再產生決策邊界與分段預測圖。
+
+請確認幾點即可開工：
+
+輸出格式偏好 ipynb 還是 py？放在 week_6/。
+評估方式可以用 80/20 stratified split 嗎？或需要 K-fold？
+需要沿用你 Week 4 的回歸模型嗎？若沒有，我會用二維多項式回歸作為 R(x)。
+https://github.com/harris6527/2025_machine_learning/tree/main/week_4
+
+這裡應該看得到我第四週的
+
+
+看到了，而且我把它接上週六的需求做完了。
+
+What I Found
+
+Data and artifacts in repo_2025_ml/week_4:
+week4_classification.csv, week4_regression.csv
+Week 4 pipeline uses StandardScaler + LogisticRegression(balanced) for classification, and PolynomialFeatures(degree=3) + LinearRegression for regression.
+What I Added
+
+repo_2025_ml/week_6/gda.py: 從零實作 GDA（二元），預設共用協方差（LDA 邊界），可切 QDA。
+repo_2025_ml/week_6/train_week6.py:
+載入 ../week_4/week4_classification.csv、../week_4/week4_regression.csv
+訓練 GDA（不依賴任何內建分類器），計算測試準確率，畫決策邊界
+以 Week 4 同款設定訓練回歸（degree=3 多項式 + 線性）
+建立分段函數 h(x)：用 Week 4 風格分類器 C(x) + 多項式回歸 R(x)
+另外也提供用 GDA 作為 C(x) 的 h(x) 視覺化比較
+repo_2025_ml/week_6/README.md: 使用說明與輸出說明
+repo_2025_ml/week_6/requirements.txt: 需要的套件清單
+How To Run
+
+安裝依賴: pip install -r repo_2025_ml/week_6/requirements.txt
+執行: python repo_2025_ml/week_6/train_week6.py
+輸出檔：
+repo_2025_ml/week_6/outputs/gda_decision_boundary.png
+repo_2025_ml/week_6/outputs/metrics_summary.csv
+repo_2025_ml/week_6/outputs/piecewise_sample.csv
+repo_2025_ml/week_6/outputs/piecewise_h_heatmap.png
+repo_2025_ml/week_6/outputs/piecewise_h_gda_heatmap.png
+Results (from a local run)
+
+GDA (shared covariance) accuracy: 0.5267
+Week4-like Logistic accuracy: 0.5740
+Regression (degree=3 poly): MAE 3.033, RMSE 4.445, R2 0.418
+決策邊界與分段 h(x) 熱圖已產生可直接放入報告。
+Notes
+
+GDA 完全自行實作，符合「不可用內建分類器」的要求。
+分段函數 h(x) 依題意結合「Week 4 的分類 + 回歸」，我用與你 HW4 一樣的設定重訓 C(x)、R(x)。同時也提供以 GDA 作為 C(x) 的 h(x) 比較圖，供你在報告中討論差異。
+若你希望第(2)小題的 C(x) 改為本週的 GDA 而非 Week 4 的 Logistic，也可以很快切換（已輸出 GDA 版本熱圖）。
+需要我把這些檔案移到你實際的 repo 結構下的 week_6/、或幫你追加 K-fold 評估/改成 QDA 邊界嗎？
+
+4 files changed
++364
+-0
+
+Undo
+
+View all changes
+README.md
++28
+-0
+
+gda.py
++98
+-0
+
+requirements.txt
++4
+-0
+
+train_week6.py
++234
+-0
+
+請重新做一次第六週的programming assignment並仔細確保是否還有任何缺漏
+
+
+Week 6 Update
+
+Added a from-scratch GDA classifier that computes priors, class means, and (optionally shared) covariance with numerical stabilisation, satisfying the “no built-in classifier” requirement (repo_2025_ml/week_6/gda.py:1).
+Built a reproducible training pipeline that loads the Week 4 CSVs, evaluates the custom GDA on an 80/20 stratified split, plots the decision boundary, retrains the Week 4-style polynomial regressor, and assembles the required piecewise model h(x) (repo_2025_ml/week_6/train_week6.py:1).
+Documented usage, outputs, and dependency setup plus a written explanation covering how GDA works, why it fits this dataset, metric definitions, and verification that h(x) returns -999 when classification predicts invalid (repo_2025_ml/week_6/README.md:1, repo_2025_ml/week_6/report.md:1, repo_2025_ml/week_6/requirements.txt:1).
+Generated deliverables in repo_2025_ml/week_6/outputs/: GDA decision-boundary plot, heatmaps for h(x) (Week4 classifier and GDA classifier variants), sample table (piecewise_sample.csv), and metrics_summary.csv reporting GDA accuracy (0.5267), logistic-baseline accuracy (0.5740), and regression MAE/RMSE/R² (3.033 / 4.445 / 0.418).
+Next steps (optional):
+
+Re-run python week_6/train_week6.py after any dataset tweaks to refresh metrics and figures.
+Embed the generated plots/tables from week_6/outputs/ directly into your report or notebook for submission.
+1 file changed
+
+Undo
+
+View all changes
+report.md
++47
+-0
+
+所以我等下就把資料夾裡的東西上傳就好嗎
+
+
+就把 week_6/ 整包收進你的 repo 即可，記得包含：
+
+gda.py, train_week6.py, report.md, README.md, requirements.txt
+outputs/ 底下的圖、metrics、sample CSV（評分時會要看這些成果）
+推到自己的 GitHub 前建議先在本機再跑一次 python train_week6.py（確認沒漏裝套件、檔案關係 OK），然後照平常流程 git add week_6, git commit, git push。完事就能交作業囉。
