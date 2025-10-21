@@ -1,0 +1,12 @@
+# Week 7 Assignment
+
+## 1. Score matching and its role in diffusion models
+Score matching reframes density estimation by training a network to approximate the score function, the gradient of the log-density, rather than the density itself. Because the score only depends on $\nabla_x \log p(x)$, the intractable partition function of energy-based models vanishes from the objective. The explicit loss compares the model score $s_\theta(x)$ with the true score via $\mathbb{E}\|s_\theta(x)-\nabla_x\log p(x)\|^2$, while the implicit variant replaces the unavailable target score with divergence terms obtained by integration by parts. In practice we cannot evaluate expectations over the true data gradient, so we corrupt data with noise and apply denoising score matching (DSM), training the network to predict the gradient of the perturbation kernel, which has a closed form under Gaussian noise.
+
+Score-based diffusion models extend DSM by learning a time-dependent score $s_\theta(x, t)$ across a continuum of noise levels. A forward diffusion process gradually destroys structure by injecting Gaussian noise according to a schedule $\sigma(t)$, producing tractable perturbation distributions. Training minimizes the DSM loss at randomly sampled timesteps, weighting by the noise variance so the network remains accurate both at small and large noise. For generation we simulate the reverse-time stochastic differential equation (SDE) or its probability flow ordinary differential equation (ODE) using the learned scores. Starting from pure Gaussian noise, the reverse dynamics iteratively denoise the sample, effectively integrating the estimated score field back toward the data manifold. Thus score matching provides both the learning objective and the gradient guidance that make diffusion-based generative modeling feasible.
+
+## 2. Unanswered questions from the lecture
+- How should we design or learn the noise schedule $\sigma(t)$ so that training remains stable while keeping sampling fast?
+- What criteria determine the weighting of DSM losses across timesteps, and how sensitive is synthesis quality to those weights?
+- In high-dimensional data (e.g., video), how does the estimator handle regions with very low probability mass without collapsing or over-smoothing?
+- Can we extend score-based models cleanly to discrete data (text, categorical variables) without resorting to continuous relaxations, and what obstacles remain?
