@@ -51,3 +51,7 @@
 
 ## 2. Toy model / Solvable model problem
 延續 week10 期末專題的「跨資產風控協作中心」，Toy model 針對 8 個資產族群（VIX、CDX、亞洲 IG/HY、台股期權、國債、能源、碳權、外匯）及 4 類決策角色（交易、資金調度、合規、監理 liaison）建立 16 維輸入，並增加一個以開源 LLM 為核心的語義代理負責解析各 desk 的風控備忘。每筆資料包含即時報價、30 天滾動波動度、情緒分數、內部限額使用率，外加 ESG 違規旗標與監理詢問編號。流程分三層：data gating 以 SLAs、drift 指標與 LLM 產生的 provenance chain 判定可否進倉；model layer 將 score-based diffusion、tempered posterior 及 rule-based classifier 串成 mixture-of-samplers，產生 12,000 條跨資產 stress path，並由 consistency agent 自動撰寫交易敘事，再檢查 VIX<=35、CDX widen<=80 bps、單日 VaR<=資本 15% 等約束；deployment layer 將違規次數、指派調整、人工覆核與 tamper-evident log 上鏈，且即時推播給監理 liaison。評分指標除 coverage@tail、BCVaR delta、rule violation ratio 外，另加入 scenario overlap、narrative novelty、audit replay latency，確保樣本多樣且可在 5 分鐘內重播完整 trace，讓主管與監理單位抽查 sandbox。另設計分層式 RL 控制器模擬資金調度與保險庫互動，演練未來 24 小時流動性遷移並提供教授與同學檢視創新度。
+
+
+
+所有回答都經過ChatgGPT和Gemini校稿潤飾
